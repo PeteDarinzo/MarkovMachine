@@ -39,11 +39,9 @@ class MarkovMachine {
         (chains[word]).push(null);
       } else {
         let nextWord = this.words[i + 1]; // get next word
-        if (!((this.chains[word]).includes(nextWord))) { // if the next word isn't part of the current word's chain
-          (this.chains[word]).push(nextWord); // push the next word onto the chain
-          if(word[word.length - 1] === '.' ) {
-            (this.chains[word]).push(null); // if word ends in a period, also push null
-          }
+        (this.chains[word]).push(nextWord); // push the next word onto the chain
+        if (word[word.length - 1] === '.') {
+          (this.chains[word]).push(null); // if word ends in a period, also push null
         }
       }
     }
@@ -66,9 +64,9 @@ class MarkovMachine {
     return nextWord;
   }
 
-  isCapital(char) {
+  isCapital(word) {
     const caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    return caps.indexOf(char) !== -1;
+    return caps.indexOf(word[0]) > -1;
   }
 
 
@@ -77,23 +75,36 @@ class MarkovMachine {
   makeText(numWords = 100) {
 
     let text = []; // empty array for result
-    let wordCount = 0;
 
     let startingWord = "start";
 
-    // randomly select words until a capitalized one is found, that will be the starting word
-    while(!(this.isCapital(startingWord[0]))) {
+    let hasCapitals = false;
+
+    for (let word of this.distinctWords) {
+      if (this.isCapital(word)) {
+        hasCapitals = true;
+        break;
+      }
+    }
+
+    if (hasCapitals) {
+      while (!(this.isCapital(startingWord))) {
+        let startIndex = this.getRandomInt(this.distinctWords.length)
+        startingWord = this.distinctWords[startIndex]; // pick a random word
+      }
+    } else {
       let startIndex = this.getRandomInt(this.distinctWords.length)
       startingWord = this.distinctWords[startIndex]; // pick a random word
     }
 
+    
     text.push(startingWord); // push the starting word onto the output text array
     let word = startingWord;
+    let wordCount = 1;
     let nextWord = this.getNextWord(word);
 
 
-
-    while ((nextWord !== null) && (wordCount <= numWords)) { // at some point the next word will be null, or the max number of words will be reached
+    while ((nextWord !== null) && (wordCount < numWords)) { // at some point the next word will be null, or the max number of words will be reached
       text.push(nextWord); // add the next word and increment word count
       wordCount++;
       word = nextWord;

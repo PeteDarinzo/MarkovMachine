@@ -6,8 +6,6 @@ const { MarkovMachine } = require("./markov");
 const argv = process.argv
 var striptags = require('striptags');
 
-const file = argv[2];
-
 
 // put a file's contents into a Markov Machine then print the output
 function markovFile(path) {
@@ -26,12 +24,13 @@ function markovFile(path) {
     }
 }
 
+
 // print the content of a web page
 async function markovUrl(url) {
     try {
         const res = await axios.get(url)
         let mm = new MarkovMachine(striptags(res.data));
-        console.log(mm.makeText());
+        console.log(mm.makeText(50));
     } catch (err) {
         console.log(`Error fetching ${url}`, err);
         process.kill(1);
